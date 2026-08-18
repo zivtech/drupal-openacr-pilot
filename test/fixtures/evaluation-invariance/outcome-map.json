@@ -1,0 +1,11 @@
+{
+  "fixture_kind": "synthetic-evaluation-outcome-map",
+  "schema_version": "fixture-v1",
+  "release_identity": "Synthetic Drupal 11 evaluation fixture",
+  "outcomes": {
+    "1.1.1": "supports",
+    "1.3.1": "does_not_support",
+    "2.1.1": "partially_supports"
+  },
+  "collector_authority": "none"
+}

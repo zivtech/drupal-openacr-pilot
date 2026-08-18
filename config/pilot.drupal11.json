@@ -1,0 +1,19 @@
+{
+  "config_version": "1.0.0",
+  "release_identity": "Drupal 11 release line / 11.x-dev",
+  "selection_url": "https://www.drupal.org/api-d7/node.json?type=project_issue&field_project=3060&field_issue_version=11.x-dev&taxonomy_vocabulary_9=1101&limit=25&sort=nid&direction=DESC&page=0",
+  "user_agent": "Zivtech-Drupal-OpenACR-Pilot/0.1 (+https://github.com/zivtech/drupal-openacr-pilot)",
+  "allowed_hosts": ["www.drupal.org"],
+  "max_records": 25,
+  "max_response_bytes": 2097152,
+  "request_timeout_ms": 30000,
+  "max_attempts": 3,
+  "max_redirects": 3,
+  "base_backoff_ms": 1000,
+  "max_backoff_ms": 30000,
+  "max_jitter_ms": 250,
+  "freshness_window_ms": 86400000,
+  "minimum_live_run_interval_ms": 3600000,
+  "canonicalization_version": "drupal-issue-snapshot-jcs-v1",
+  "projection_schema_version": "1.0.0"
+}
