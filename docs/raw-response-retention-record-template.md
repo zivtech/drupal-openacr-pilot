@@ -1,7 +1,9 @@
 # Raw-Response Retention Record Template
 
-> **Status:** Required before Phase 1 implementation. The default is guaranteed
-> cleanup on success, failure, cancellation, and exception.
+> **Status:** Required before any live request, source profiling, or snapshot
+> promotion. Fixture-only Phase 1 implementation creates no source-response
+> custody. The default is guaranteed cleanup on success, failure, cancellation,
+> and exception.
 
 Complete one record for the approved collector environment. Do not place secrets,
 credentials, raw response bodies, or private infrastructure details in the public
@@ -11,8 +13,10 @@ record.
 
 - Record ID:
 - Collector version or commit:
+- Named collector:
 - Named custodian:
 - Repository maintainer:
+- Evidence reviewer:
 - Authorized users:
 - Approval date:
 
@@ -30,7 +34,8 @@ record.
 
 ## Retention and deletion
 
-- Default deletion event: guaranteed cleanup after raw hashing, projection, or any
+- Default deletion event: guaranteed cleanup after representation hashing,
+  projection, or any
   parsing/validation failure, cancellation, or exception
 - Crash recovery: startup sweep deletes any unapproved raw file left by a prior run
 - Deletion method:
@@ -60,7 +65,8 @@ fields, add comments, or change evaluation outcomes.
 
 ## Approval gate
 
-- [ ] Custodian and authorized users are named.
+- [ ] Collector, custodian, repository maintainer, evidence reviewer, and
+      authorized users are named.
 - [ ] Public-safe storage identifier is recorded.
 - [ ] Backups, sync, caches, logs, and temporary files are addressed.
 - [ ] Success, failure, cancellation, exception, and crash-recovery deletion paths
@@ -68,5 +74,10 @@ fields, add comments, or change evaluation outcomes.
 - [ ] Deletion method, one-hour default deadline, and receipt location are recorded.
 - [ ] Any exception has a named human approver and deadline of 30 days or less.
 - [ ] The independent provenance reviewer accepted the record.
+- [ ] The exact config digest, deletion test receipt, and Phase 1 User-Agent were
+      reviewed.
+- [ ] A separate authorization identifies the specific live request, profiling,
+      or snapshot-promotion action.
 
-Any unchecked item blocks collection.
+Any unchecked item blocks live requests, source profiling, and snapshot promotion;
+it does not block synthetic-fixture implementation.

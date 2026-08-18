@@ -18,15 +18,17 @@ identifies a different license. Each retained record or its manifest must preser
 - a notice that the source was normalized into a retained projection, with the
   canonicalization version.
 
-If the source does not supply usable creator credit, the proposed pilot
-release-scope owner must approve a reasonable collective-credit method before
-collection. This policy is not legal advice, and a human must review attribution
-before publishing a projection.
+If the source does not supply usable creator credit, the independent pilot's named
+evidence reviewer and repository maintainer must document and approve a reasonable
+collective-credit method before candidate creation. Mike Gifford's acceptance is
+additionally required before that method is characterized as upstream/community
+policy. This policy is not legal advice, and a human must review attribution before
+publishing a projection.
 
-This Phase 0 repository contains no collector code. A later charter must select
-and document a code license before collector implementation. GNU General Public
-License version 2 or later is the preferred candidate for Drupal-aligned code,
-but this document does not authorize or license code that does not yet exist.
+This Phase 0 package contains no collector code. The Phase 1 implementation plan
+selects GNU General Public License version 2 or later for Drupal-aligned collector
+code. That license applies only after the corresponding code and license text are
+added; this document does not license code that does not yet exist.
 
 [OpenACR](https://github.com/GSA/openacr) is a United States government project
 whose repository states that its work is public domain by default. This pilot
