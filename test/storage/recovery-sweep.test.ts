@@ -66,3 +66,19 @@ test("rejects a symlinked recovery root and a symlinked representation", async (
     await rm(root, { recursive: true, force: true });
   }
 });
+
+test("does not invent an empty-representation hash when only a crash directory exists", async () => {
+  const root = await mkdtemp(join(tmpdir(), "openacr-recovery-test-"));
+  try {
+    await mkdir(join(root, "response-synthetic-run-before-file-abc123"));
+
+    const receipts = await sweepResponseRepresentations(root, "2026-08-18T13:09:16Z");
+
+    assert.equal(receipts.length, 1);
+    assert.equal(receipts[0]?.representationSha256, null);
+    assert.equal(receipts[0]?.representationBytes, 0);
+    assert.equal(receipts[0]?.recovery, true);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});

@@ -32,7 +32,7 @@ export interface DeletionEvidence {
   readonly deletedAt: string;
   readonly method: "unlink" | "recovery_unlink";
   readonly verification: "path_absent";
-  readonly representationSha256: string;
+  readonly representationSha256: string | null;
   readonly representationBytes: number;
   readonly recovery: boolean;
 }
@@ -62,6 +62,19 @@ async function removeCaptureFile(filePath: string, directory: string): Promise<v
     }
   }
   await rmdir(directory);
+}
+
+async function writeCompleteChunk(handle: FileHandle, chunk: Uint8Array): Promise<void> {
+  let offset = 0;
+  while (offset < chunk.byteLength) {
+    const result = await handle.write(chunk, offset, chunk.byteLength - offset, null);
+    if (result.bytesWritten <= 0) {
+      throw new ResponseRepresentationCaptureError(
+        "response representation write made no progress",
+      );
+    }
+    offset += result.bytesWritten;
+  }
 }
 
 export async function captureResponseRepresentation(
@@ -94,7 +107,7 @@ export async function captureResponseRepresentation(
         );
       }
       hash.update(chunk);
-      await handle.write(chunk);
+      await writeCompleteChunk(handle, chunk);
     }
     await handle.sync();
     await handle.close();

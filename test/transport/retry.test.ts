@@ -44,6 +44,10 @@ test("classifies malformed and combined values without splitting an HTTP-date co
     state: "multiple",
     milliseconds: null,
   });
+  assert.throws(
+    () => parseRetryAfter("Tue, 18 Aug 2026 13:09:21 GMT", nowMs + 0.5),
+    /retry clock/u,
+  );
 });
 
 test("uses bounded exponential backoff plus floor jitter when no valid header exists", () => {
@@ -98,4 +102,5 @@ test("rejects invalid unit and random domains", () => {
   assert.throws(() => calculateRetry({ ...base, attempt: 0 }), /attempt/u);
   assert.throws(() => calculateRetry({ ...base, randomValue: 1 }), /random/u);
   assert.throws(() => calculateRetry({ ...base, baseBackoffMs: -1 }), /backoff/u);
+  assert.throws(() => calculateRetry({ ...base, nowMs: nowMs + 0.5 }), /retry clock/u);
 });

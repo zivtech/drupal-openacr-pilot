@@ -1,4 +1,5 @@
 import type { RetryAfterParseState } from "../domain/types.js";
+import { isValidEpochMilliseconds } from "../time/strict-utc.js";
 
 const imfFixdate =
   /^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4} \d{2}:\d{2}:\d{2} GMT$/u;
@@ -32,6 +33,9 @@ function validInteger(value: number): boolean {
 }
 
 export function parseRetryAfter(value: string | null, nowMs: number): ParsedRetryAfter {
+  if (!isValidEpochMilliseconds(nowMs)) {
+    throw new RangeError("retry clock must be a valid integer epoch-millisecond value");
+  }
   if (value === null) {
     return Object.freeze({ state: "absent", milliseconds: null });
   }
@@ -71,8 +75,8 @@ function assertRetryInput(input: RetryInput): void {
   ) {
     throw new RangeError("backoff and jitter units must be non-negative safe integer milliseconds");
   }
-  if (!Number.isFinite(input.nowMs)) {
-    throw new RangeError("retry clock must be a finite epoch-millisecond value");
+  if (!isValidEpochMilliseconds(input.nowMs)) {
+    throw new RangeError("retry clock must be a valid integer epoch-millisecond value");
   }
   if (!(input.randomValue >= 0 && input.randomValue < 1)) {
     throw new RangeError("random value must satisfy 0 <= value < 1");

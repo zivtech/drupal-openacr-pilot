@@ -3,7 +3,10 @@ import test from "node:test";
 
 import { buildManifest } from "../../src/manifest/build-manifest.js";
 import { buildSelectionReceipt } from "../../src/receipt/build-receipt.js";
-import { renderProvenanceMarkdown } from "../../src/render/provenance-markdown.js";
+import {
+  renderProvenanceMarkdown,
+  renderUnavailableProvenanceMarkdown,
+} from "../../src/render/provenance-markdown.js";
 import { projectRecord } from "../../src/source/project-record.js";
 import type { DrupalSourceIssue } from "../../src/domain/types.js";
 import { buildSyntheticIssue, selectionUrl } from "../fixtures/selection/synthetic-pages.js";
@@ -86,4 +89,50 @@ test("renders provenance, byte domains, exclusions, negative space, and escaped 
   assert.doesNotMatch(markdown, /<script>/u);
   assert.match(markdown, /\\\[focus\\\]/u);
   assert.match(markdown, /Creative Commons Attribution-ShareAlike 2\.0 Generic/u);
+});
+
+test("renders unavailable collection state without implying a snapshot or evaluation", () => {
+  const receipt = buildSelectionReceipt({
+    schema_version: "1.0.0",
+    config_digest: configDigest,
+    requested_url: selectionUrl,
+    final_url: null,
+    user_agent: "Zivtech-Drupal-OpenACR-Pilot/0.1 (+https://github.com/zivtech/drupal-openacr-pilot)",
+    fetched_at: timestamp,
+    observation_state: "unavailable",
+    http: {
+      status: 429,
+      content_encoding: null,
+      transfer_encoding: null,
+      declared_content_length_bytes: null,
+      representation_bytes: null,
+    },
+    attempts: [
+      {
+        attempt: 1,
+        started_at: timestamp,
+        response_status: 429,
+        retry_after_value: "120",
+        retry_after_parse_state: "valid_delta_seconds",
+        retry_after_ms: 120_000,
+        retry_delay_ms: null,
+      },
+    ],
+    pagination: { self: null, first: null, last: null, next: null },
+    ordered_ids: [],
+    page_representation_sha256: null,
+    termination_reason: "retry_after_exceeds_maximum",
+  });
+
+  const markdown = renderUnavailableProvenanceMarkdown({
+    receipt,
+    freshnessWindowMs: 86_400_000,
+  });
+
+  assert.match(markdown, /no candidate created/iu);
+  assert.match(markdown, /Observation state: unavailable/u);
+  assert.match(markdown, /Freshness: unavailable/u);
+  assert.match(markdown, /Fetched at: 2026-08-18T13:09:16Z/u);
+  assert.match(markdown, /retry\\_after\\_exceeds\\_maximum/u);
+  assert.match(markdown, /not an accessibility evaluation or an ACR/iu);
 });

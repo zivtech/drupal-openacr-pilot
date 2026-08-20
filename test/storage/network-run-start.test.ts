@@ -130,6 +130,22 @@ test("rejects unsafe run IDs before deriving any state path", async () => {
   });
 });
 
+test("rejects a fractional epoch-millisecond clock before creating state", async () => {
+  await withRepository(async (root) => {
+    await assert.rejects(
+      admitNetworkRun({
+        repositoryRoot: root,
+        runId: "synthetic-run-fractional-clock",
+        nowMs: startMs + 0.5,
+        configDigest: digest,
+        config,
+      }),
+      /network-run clock/u,
+    );
+    await assert.rejects(access(join(root, "var", "state")));
+  });
+});
+
 test("rejects a symlinked state directory without writing through it", async () => {
   await withRepository(async (root) => {
     const outsideTarget = join(root, "outside-state-target");

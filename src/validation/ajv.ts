@@ -14,6 +14,8 @@ import type {
   ValidationIssue,
   ValidationResult,
 } from "../domain/types.js";
+import { isStrictUtcTimestamp } from "../time/strict-utc.js";
+import { isStrictHttpsUrl } from "./formats.js";
 
 export type { ValidationIssue, ValidationResult } from "../domain/types.js";
 
@@ -58,7 +60,15 @@ const ajv = new Ajv2020({
   removeAdditional: false,
   strict: true,
   useDefaults: false,
-  validateFormats: false,
+  validateFormats: true,
+});
+ajv.addFormat("strict-utc-timestamp", {
+  type: "string",
+  validate: isStrictUtcTimestamp,
+});
+ajv.addFormat("strict-https-url", {
+  type: "string",
+  validate: isStrictHttpsUrl,
 });
 
 const configValidator = ajv.compile<PilotConfig>(loadSchema(schemaFiles.config));

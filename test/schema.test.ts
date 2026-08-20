@@ -145,6 +145,10 @@ test("rejects synthetic source schema drift in required page fields", () => {
   const wrongList = syntheticPage();
   wrongList.list = {};
   assertInvalid(validateDrupalPage(wrongList), "type");
+
+  const malformedNext = syntheticPage();
+  malformedNext.next = "https://[";
+  assertInvalid(validateDrupalPage(malformedNext), "format");
 });
 
 test("accepts the allowlisted retained record schema", () => {
@@ -191,6 +195,11 @@ test("validates complete and unavailable receipt shapes without implicit values"
   }
   delete attempt.retry_delay_ms;
   assertInvalid(validateReceipt(missingAttemptField), "required");
+
+  const credentialedNext = selectionReceipt();
+  const credentialedPagination = credentialedNext.pagination as Record<string, unknown>;
+  credentialedPagination.next = "https://user:secret@www.drupal.org/page/1";
+  assertInvalid(validateReceipt(credentialedNext), "format");
 });
 
 test("validates manifest, deletion receipt, and network-run-start contracts", () => {
@@ -243,4 +252,75 @@ test("validates manifest, deletion receipt, and network-run-start contracts", ()
   const driftedManifest = structuredClone(manifest) as Record<string, unknown>;
   driftedManifest.extra = "not allowed";
   assertInvalid(validateManifest(driftedManifest), "additionalProperties");
+});
+
+test("rejects impossible UTC timestamps at every persisted schema boundary", () => {
+  const impossible = "2026-02-30T13:09:16Z";
+
+  const page = syntheticPage();
+  const [sourceIssue] = page.list as Array<Record<string, unknown>>;
+  assert.ok(sourceIssue);
+  sourceIssue.created = impossible;
+  assertInvalid(validateDrupalPage(page), "format");
+
+  const record = retainedRecord();
+  const projection = record.projection as Record<string, unknown>;
+  projection.source_changed_at = impossible;
+  assertInvalid(validateRecord(record), "format");
+
+  const receipt = selectionReceipt();
+  receipt.fetched_at = impossible;
+  assertInvalid(validateReceipt(receipt), "format");
+
+  assertInvalid(
+    validateManifest({
+      schema_version: "1.0.0",
+      snapshot_id: `drupal11-issue-snapshot-${digest.slice(0, 16)}`,
+      manifest_sha256: digest,
+      config_digest: secondDigest,
+      selection_receipt_sha256: digest,
+      release_identity: "Drupal 11 release line / 11.x-dev",
+      created_at: impossible,
+      freshness: "fresh",
+      fresh_until: "2026-08-19T13:09:16Z",
+      prior_snapshot_id: null,
+      record_count: 0,
+      ordered_records: [],
+    }),
+    "format",
+  );
+
+  assertInvalid(
+    validateDeletionReceipt({
+      schema_version: "1.0.0",
+      record_id: "delete-synthetic-run",
+      run_id: "synthetic-run",
+      snapshot_candidate_id: null,
+      representation_created_at: timestamp,
+      deleted_at: impossible,
+      cleanup_deadline: "2026-08-18T14:09:16Z",
+      method: "unlink",
+      verification: "path_absent",
+      backup_cache_disposition: "not_backed_up_or_cached",
+      exception_status: "none",
+      representation_sha256: digest,
+      representation_bytes: 1,
+      recovery: false,
+    }),
+    "format",
+  );
+
+  assertInvalid(
+    validateNetworkRunStart({
+      schema_version: "1.0.0",
+      run_id: "synthetic-run",
+      started_at: timestamp,
+      next_eligible_at: impossible,
+      selection_url: selectionUrl,
+      user_agent: userAgent,
+      config_digest: digest,
+      minimum_live_run_interval_ms: 3600000,
+    }),
+    "format",
+  );
 });

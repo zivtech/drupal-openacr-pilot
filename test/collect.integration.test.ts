@@ -98,12 +98,19 @@ test("writes an unavailable receipt outside snapshots and creates no candidate o
 
       assert.equal(result.status, "unavailable");
       if (result.status !== "unavailable") return;
+      assert.match(
+        result.provenancePath,
+        /var\/receipts\/synthetic-collect-429\.provenance\.md$/u,
+      );
       const receipt = JSON.parse(await readFile(result.receiptPath, "utf8")) as {
         observation_state: string;
         termination_reason: string;
       };
       assert.equal(receipt.observation_state, "unavailable");
       assert.equal(receipt.termination_reason, "retry_after_exceeds_maximum");
+      const provenance = await readFile(result.provenancePath, "utf8");
+      assert.match(provenance, /no candidate created/iu);
+      assert.match(provenance, /Freshness: unavailable/u);
       assert.deepEqual(await readdir(join(root, "var", "candidates")), []);
     },
   );

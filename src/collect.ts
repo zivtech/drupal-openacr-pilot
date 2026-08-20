@@ -13,7 +13,10 @@ import {
   buildSelectionReceipt,
   type SelectionReceiptPayload,
 } from "./receipt/build-receipt.js";
-import { renderProvenanceMarkdown } from "./render/provenance-markdown.js";
+import {
+  renderProvenanceMarkdown,
+  renderUnavailableProvenanceMarkdown,
+} from "./render/provenance-markdown.js";
 import { validateSelection, type SelectionResult } from "./selection/validate-selection.js";
 import { projectRecord } from "./source/project-record.js";
 import { sweepResponseRepresentations } from "./storage/recovery-sweep.js";
@@ -43,6 +46,7 @@ export type CollectCandidateResult =
   | {
       readonly status: "unavailable";
       readonly receiptPath: string;
+      readonly provenancePath: string;
       readonly deletionReceiptPath: string | null;
       readonly terminationReason: string;
     };
@@ -148,19 +152,28 @@ async function writeUnavailableArtifacts(
   repositoryRoot: string,
   runId: string,
   receipt: ReturnType<typeof buildSelectionReceipt>,
+  provenanceMarkdown: string,
   deletion: DeletionReceipt | null,
-): Promise<{ readonly receiptPath: string; readonly deletionReceiptPath: string | null }> {
+): Promise<{
+  readonly receiptPath: string;
+  readonly provenancePath: string;
+  readonly deletionReceiptPath: string | null;
+}> {
   const root = resolve(repositoryRoot, "var", "receipts");
   await ensureRealDirectory(root);
   const receiptPath = join(root, `${runId}.json`);
   await writeFile(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`, { flag: "wx", mode: 0o600 });
-  if (deletion === null) return Object.freeze({ receiptPath, deletionReceiptPath: null });
+  const provenancePath = join(root, `${runId}.provenance.md`);
+  await writeFile(provenancePath, provenanceMarkdown, { flag: "wx", mode: 0o600 });
+  if (deletion === null) {
+    return Object.freeze({ receiptPath, provenancePath, deletionReceiptPath: null });
+  }
   const deletionReceiptPath = join(root, `${runId}.deletion.json`);
   await writeFile(deletionReceiptPath, `${JSON.stringify(deletion, null, 2)}\n`, {
     flag: "wx",
     mode: 0o600,
   });
-  return Object.freeze({ receiptPath, deletionReceiptPath });
+  return Object.freeze({ receiptPath, provenancePath, deletionReceiptPath });
 }
 
 async function prepareTemporaryRoot(repositoryRoot: string): Promise<string> {
@@ -250,10 +263,15 @@ export async function collectCandidate(
 
   if (selection === null || !selection.complete) {
     const deletion = deletionReceipt(fetchResult, options.runId, null);
+    const provenanceMarkdown = renderUnavailableProvenanceMarkdown({
+      receipt,
+      freshnessWindowMs: config.freshness_window_ms,
+    });
     const paths = await writeUnavailableArtifacts(
       options.repositoryRoot,
       options.runId,
       receipt,
+      provenanceMarkdown,
       deletion,
     );
     return Object.freeze({

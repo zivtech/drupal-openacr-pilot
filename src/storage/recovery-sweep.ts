@@ -49,12 +49,14 @@ export async function sweepResponseRepresentations(
     const filePath = join(directory, "representation.bin");
     let bytes = new Uint8Array();
     let createdAt = deletedAt;
+    let representationSha256: string | null = null;
     if (children.includes("representation.bin")) {
       const fileStat = await lstat(filePath);
       if (!fileStat.isFile() || fileStat.isSymbolicLink()) {
         throw new Error(`recovery representation is not a regular file: ${entry.name}`);
       }
       bytes = new Uint8Array(await readFile(filePath));
+      representationSha256 = createHash("sha256").update(bytes).digest("hex");
       createdAt = fileStat.birthtime.toISOString();
       await unlink(filePath);
     }
@@ -65,7 +67,7 @@ export async function sweepResponseRepresentations(
         deletedAt,
         method: "recovery_unlink" as const,
         verification: "path_absent" as const,
-        representationSha256: createHash("sha256").update(bytes).digest("hex"),
+        representationSha256,
         representationBytes: bytes.byteLength,
         recovery: true,
       }),

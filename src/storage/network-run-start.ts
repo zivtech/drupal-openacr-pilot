@@ -2,6 +2,7 @@ import { open, readFile, rename, unlink } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
 import type { NetworkRunStart, PilotConfig } from "../domain/types.js";
+import { isValidEpochMilliseconds } from "../time/strict-utc.js";
 import { validateNetworkRunStart } from "../validation/ajv.js";
 import { ensureRealDirectory } from "./safe-directory.js";
 
@@ -73,8 +74,12 @@ export async function admitNetworkRun(
   if (!/^[A-Za-z0-9._-]+$/u.test(options.runId)) {
     throw new TypeError("run ID contains unsafe path characters");
   }
-  if (!Number.isFinite(options.nowMs)) {
-    throw new RangeError("network-run clock must be a finite epoch-millisecond value");
+  if (!isValidEpochMilliseconds(options.nowMs)) {
+    throw new RangeError("network-run clock must be a valid integer epoch-millisecond value");
+  }
+  const nextEligibleMs = options.nowMs + options.config.minimum_live_run_interval_ms;
+  if (!isValidEpochMilliseconds(nextEligibleMs)) {
+    throw new RangeError("next eligible time must be a valid integer epoch-millisecond value");
   }
   const varDirectory = resolve(options.repositoryRoot, "var");
   const stateDirectory = resolve(varDirectory, "state");
@@ -111,9 +116,7 @@ export async function admitNetworkRun(
       schema_version: "1.0.0",
       run_id: options.runId,
       started_at: new Date(options.nowMs).toISOString(),
-      next_eligible_at: new Date(
-        options.nowMs + options.config.minimum_live_run_interval_ms,
-      ).toISOString(),
+      next_eligible_at: new Date(nextEligibleMs).toISOString(),
       selection_url: options.config.selection_url,
       user_agent: options.config.user_agent,
       config_digest: options.configDigest,

@@ -60,4 +60,8 @@ test("turns invalid retrieval times and invalid millisecond domains into unavail
   );
   assert.throws(() => classifyFreshness("retrieved", fetchedAt, -1, Date.parse(fetchedAt)), /window/u);
   assert.throws(() => classifyFreshness("retrieved", fetchedAt, windowMs, Number.NaN), /current time/u);
+  assert.throws(
+    () => classifyFreshness("retrieved", fetchedAt, windowMs, Date.parse(fetchedAt) + 0.5),
+    /current time/u,
+  );
 });
