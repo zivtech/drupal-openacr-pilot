@@ -1,0 +1,25 @@
+{
+  "name": "@zivtech/drupal-openacr-pilot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fixture-first Drupal issue snapshot collector prototype",
+  "license": "GPL-2.0-or-later",
+  "type": "module",
+  "engines": {
+    "node": "24.18.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build --silent && node --test 'dist/test/**/*.test.js'",
+    "test:coverage": "npm run build --silent && node --test --experimental-test-coverage --test-coverage-lines=80 --test-coverage-branches=80 --test-coverage-functions=80 'dist/test/**/*.test.js'"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "canonicalize": "4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "typescript": "7.0.2"
+  }
+}

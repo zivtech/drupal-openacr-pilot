@@ -1,0 +1,35 @@
+name: Fixture-only checks
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Node 24.18.0
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use reviewed Node runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install exact dependency tree
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Run fixture-only tests
+        run: npm test
+
+      - name: Enforce coverage gates
+        run: npm run test:coverage

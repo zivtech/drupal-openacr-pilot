@@ -1,13 +1,18 @@
 # Drupal 11 Issue-Driven OpenACR Pilot Charter
 
-> **Charter status:** Draft for human review
+> **Charter status:** Authorized by the current workflow sponsor for independent
+> Zivtech Phase 1 planning and collector implementation; operational and community
+> adoption gates remain pending
 >
 > **Charter ID:** `drupal11-issue-traceability-pilot-v0`
 >
 > **Drafted on:** 2026-08-18
 >
-> **Authority:** Phase 0 only. This charter does not authorize a collector,
-> evaluation, ACR draft, issue write, import, signature, or publication.
+> **Authority:** Independent pilot only. This charter authorizes a Phase 1 data
+> plan and implementation of a read-only collector in the Zivtech pilot repository.
+> It does not authorize a live collection run until the operational gates below
+> are satisfied, nor any evaluation, ACR draft, issue write, import, signature, or
+> publication.
 
 ## What is this pilot for?
 
@@ -34,8 +39,11 @@ does not establish their approval.
 | Product family | Drupal core | Current workflow sponsor | Provided for proposal |
 | Pilot release identity | Drupal 11 release line, represented in the issue API by `field_issue_version=11.x-dev` | Current workflow sponsor selected “Drupal 11”; Codex mapped the observed API field | Mike Gifford must confirm this release-line interpretation |
 | Proposed pilot release-scope owner | Mike Gifford | Current workflow sponsor | Role acceptance pending |
-| Authorized issuer | `no issuer` | Current workflow sponsor | Confirmed for this proposal |
-| Evidence repository | Public GitHub repository `AlexU-A/drupal-openacr-pilot` | Codex selected under the sponsor's delegated repository choice | Proposed for Phase 0 review; not an official Drupal repository |
+| Independent pilot implementation authority | Zivtech pilot, authorized by the current workflow sponsor on 2026-08-18 | Current workflow sponsor | Phase 1 planning and collector implementation authorized; live collection and snapshot promotion gates remain pending |
+| Authorized issuer | `no issuer` | Current workflow sponsor | Effective state until an organization accepts publication authority and names a representative |
+| Proposed future issuer | Drupal Association, acting on behalf of the Drupal core project | Current workflow sponsor's follow-up plus Drupal governance review | Association acceptance, a named representative, and Drupal Core Leadership Team technical-scope approval are pending |
+| Evidence and implementation repository | Public GitHub repository `zivtech/drupal-openacr-pilot` | Current workflow sponsor corrected the repository preference | Authorized for the independent pilot; not an official Drupal repository |
+| Community review path | `mgifford/drupal-core` pull request 57, submitted from the Zivtech-owned fork | Current workflow sponsor | Pending upstream review; fork creation, review, or merge does not confer issuer or Drupal project authority |
 | Release evaluation | Must be commissioned separately | Current workflow sponsor | Confirmed for this proposal |
 
 Drupal.org listed Drupal 11.4.4 as the newest Drupal 11 release observed on
@@ -49,15 +57,24 @@ pilot**, not a Drupal 11.4.4 evaluation or point-release ACR.
 | Role | Named person or state | May do | May not do |
 |---|---|---|---|
 | Proposed pilot release-scope owner | Mike Gifford, pending his acceptance | Approve or reject the release-line identity and pilot relevance | Act as an official Drupal release owner through this proposal or treat the snapshot as conformance evidence |
-| Charter drafter | OpenAI Codex, working under the authenticated `AlexU-A` GitHub account | Draft and revise Phase 0 documents | Approve human authority or make product claims |
+| Independent pilot operator and submitter | Zivtech | Plan and implement the bounded read-only pilot in its repository and submit it for review | Represent the pilot, pull request, or a merge as official Drupal approval or issue an official Drupal core ACR |
+| Charter drafter | OpenAI Codex, working for the current workflow sponsor | Draft and revise pilot documents and implementation under the recorded authorization | Approve human authority or make product claims |
 | Phase 0 reviewer | Independent accessibility scope reviewer, to be recorded in the review disposition | Review scope, claims, privacy, and provenance | Replace missing human ownership or evaluation evidence |
-| Collector | Unassigned and unauthorized | Nothing until a later Phase 1 approval | Fetch or retain a pilot snapshot under this charter |
+| Collector | Unassigned | Implementation may proceed, but no live fetch or snapshot promotion until the collector and raw-response custodian are recorded and live action is separately authorized | Fetch or retain a live pilot snapshot before every operational and live-action gate is complete |
 | Evaluator | Unassigned; a separate commission is required | Nothing under this charter | Infer outcomes from issues or draft an ACR |
+| Proposed future issuer | Drupal Association, pending institutional acceptance and a named representative | If it accepts the role, own human sign-off, corrections, and publication for an evidence-backed Drupal core ACR | Acquire authority merely because this proposal names it or replace Drupal core technical-scope approval |
 | Authorized issuer | `no issuer` | No publication authority exists | Sign, import, submit, or publish an ACR |
 
-Unassigned collector and evaluator roles are deliberate stop states. Phase 1 cannot
-begin until the proposed pilot release-scope owner accepts the charter and those
-roles are assigned in a reviewed amendment.
+The collector and evaluator belong to different lanes. The current workflow
+sponsor has authorized Phase 1 planning and implementation in the Zivtech pilot
+repository. A live collection run and snapshot promotion remain blocked until a
+collector, repository maintainer, evidence reviewer, and raw-response custodian are
+recorded, the retention record is complete, and a separate live-action
+authorization is recorded. An evaluator remains unassigned
+until a separate evaluation engagement is approved; evaluation staffing is not a
+prerequisite for collector implementation. Mike Gifford's acceptance remains a
+gate for describing the work as an upstream or community pilot, not for the
+independent Zivtech prototype.
 
 ## Which issues would the pilot select?
 
@@ -72,6 +89,10 @@ The exact public query is:
 ```text
 https://www.drupal.org/api-d7/node.json?type=project_issue&field_project=3060&field_issue_version=11.x-dev&taxonomy_vocabulary_9=1101&limit=25&sort=nid&direction=DESC&page=0
 ```
+
+Every future Phase 1 attempt must send the exact reviewed contact header
+`User-Agent: Zivtech-Drupal-OpenACR-Pilot/0.1 (+https://github.com/zivtech/drupal-openacr-pilot)`.
+Changing that value requires configuration review and a new configuration digest.
 
 The selection includes every issue status, category, priority, and component that
 meets those mechanical filters. The charter does not privilege closed, active,
@@ -133,8 +154,9 @@ source integrity, traceability, and human review:
 - source creation and changed timestamps supplied by Drupal.org;
 - retrieval time, observation state, exact requested URL, page identifier, and
   returned pagination links;
-- raw-response SHA-256, canonical-projection SHA-256, canonicalization version,
-  and collector/configuration digest; and
+- page-representation SHA-256 over the exact content-decoded bytes exposed by the
+  HTTP client, canonical-projection SHA-256, canonicalization version, and
+  collector/configuration digest; and
 - later typed linkage identifiers, only after a separately approved evidence
   linkage phase.
 
@@ -153,9 +175,11 @@ a reasonable collective-credit method.
 
 The public GitHub repository must retain canonical projections and receipts for
 the life of the pilot so that released snapshot interpretations remain inspectable.
-It must not contain raw response bodies. By default, raw entity-response bytes may
-exist only in an ephemeral collector-local temporary directory for the duration of
-hashing, projection, and validation. The collector must delete them through a
+It must not contain raw response bodies. By default, the exact content-decoded
+response-representation bytes exposed by the HTTP client may exist only in an
+ephemeral collector-local temporary directory for the duration of hashing,
+projection, and validation. They are sensitive raw-response material under this
+policy even though they are not compressed wire bytes. The collector must delete them through a
 guaranteed cleanup path on success, parsing or validation failure, cancellation,
 and exception, then record a deletion receipt. A startup recovery sweep must
 delete unapproved raw files left by a crash. Without a recorded debugging
@@ -163,27 +187,35 @@ exception, cleanup must finish before normal process exit and no later than one
 hour after temporary-file creation.
 
 A named human may approve a debugging exception for no more than 30 days. Before
-implementation, the [raw-response retention record](raw-response-retention-record-template.md)
-must name the storage class and location identifier, custodian, authorized users,
+any live request, source profiling, or snapshot promotion, the
+[raw-response retention record](raw-response-retention-record-template.md) must
+name the storage class and location identifier, custodian, authorized users,
 backup/cache/temp-file treatment, deletion method, deadline, and deletion-receipt
-location. Unrecorded or automatically backed-up raw storage is prohibited. The
-public record retains the raw hash and inspectable minimal projection.
+location. Fixture-only implementation does not create source-response custody.
+Unrecorded or automatically backed-up response storage is prohibited. The public
+record retains the page-representation hash and inspectable minimal projection.
 
 If a privacy, licensing, security, or takedown concern arises, collection stops.
 The release owner and repository maintainer review whether text must be removed.
 When lawful and appropriate, the repository retains a tombstone, source URL,
 hashes, and disposition instead of silently rewriting history.
 
-This is a proposed operational policy, not legal advice. Mike Gifford must accept
-it as the proposed pilot release-scope owner before Phase 1 planning.
+This is a proposed operational policy, not legal advice. The current workflow
+sponsor has accepted it for independent Zivtech planning and implementation. Mike
+Gifford must accept it before upstream or community adoption.
 
 ## What are the stop conditions?
 
-Stop before collector implementation if any of these conditions applies:
+Stop collector implementation or any live run, as indicated, if any of these
+conditions applies:
 
-- Mike Gifford does not accept the proposed pilot release-scope-owner role or the
-  Drupal 11 release-line interpretation.
-- The collector, evidence reviewer, and repository maintainer are not named.
+- Stop upstream/community adoption if Mike Gifford does not accept the proposed
+  pilot release-scope-owner role or the Drupal 11 release-line interpretation;
+  this does not prevent the clearly labeled independent prototype.
+- Stop before a live collection run or snapshot promotion if the collector,
+  evidence reviewer, repository maintainer, and raw-response custodian are not
+  recorded, the retention record is incomplete, or separate live-action
+  authorization has not been recorded.
 - A release evaluation is treated as included rather than separately commissioned.
 - The exact query cannot be reproduced, returns more than 25 records in its `list`,
   or stops producing an ordered top-25 response.
@@ -201,11 +233,18 @@ Stop before collector implementation if any of these conditions applies:
   ACR.
 - Someone proposes committing an ACR draft to a public repository while the issuer
   state remains `no issuer`; public Git history is a publication surface.
+- Someone describes the Zivtech repository, its pilot outputs, the community-review
+  pull request, or an upstream merge as Drupal Association or Drupal Core
+  Leadership Team approval.
 
 ## What does approval authorize?
 
-Approval authorizes a separate Phase 1 implementation plan for a read-only frozen
-snapshot collector. It does not authorize the implementation itself.
+The current workflow sponsor's approval authorizes a Phase 1 data plan and
+implementation of a read-only frozen-snapshot collector in
+`zivtech/drupal-openacr-pilot`. It does not authorize a live collection run or
+snapshot promotion until the operational roles and raw-response retention record
+are complete and a human separately authorizes the specific live request or
+promotion action.
 
 Approval does not establish a product evaluation scope, accessibility-support
 baseline, conformance target, sample, outcome, legal position, completed ACR, or
@@ -213,6 +252,9 @@ publication authority.
 
 ## Human approval record
 
+- [x] The current workflow sponsor authorizes independent Zivtech Phase 1 planning
+      and collector implementation and confirms that this is a pilot, not an
+      official release.
 - [ ] Mike Gifford accepts the proposed pilot release-scope-owner role.
 - [ ] Mike Gifford accepts “Drupal 11 release line / `11.x-dev`” as the pilot
       traceability identity.
@@ -221,11 +263,22 @@ publication authority.
       and maximum 30-day human-approved exception.
 - [ ] The raw-response retention record names custody, storage, access,
       backup/cache treatment, deletion, and receipt details.
-- [ ] A collector, repository maintainer, and evidence reviewer are named.
+- [ ] A collector, repository maintainer, evidence reviewer, and raw-response
+      custodian are recorded before a live collection run.
+- [ ] After the operational controls above are reviewed, a human records separate
+      authorization for the specific live request or snapshot-promotion action.
 - [ ] The scope/claim-boundary review is attached and all blocking findings are
       resolved.
 
-Until every box is checked, Phase 1 remains blocked.
+Planning and implementation may proceed under the checked sponsor authorization.
+A live collection run and snapshot promotion remain blocked until the operational
+boxes are checked. Upstream/community adoption remains blocked until Mike Gifford
+records the applicable acceptances.
+
+Publication remains separately blocked unless the Drupal Association accepts the
+issuer role, names an authorized representative, and obtains the applicable
+Drupal Core Leadership Team technical-scope approval. Those publication approvals
+do not substitute for the separately commissioned evaluation.
 
 ## References
 
@@ -236,3 +289,4 @@ Until every box is checked, Phase 1 remains blocked.
 - [Drupal core ACR process guidance](https://mgifford.github.io/drupal-core/docs/acr-process.html)
 - [GSA OpenACR](https://github.com/GSA/openacr)
 - [WCAG Evaluation Methodology 2.0](https://www.w3.org/TR/wcag-em-2/)
+- [Community-review pull request](https://github.com/mgifford/drupal-core/pull/57)

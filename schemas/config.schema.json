@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zivtech/drupal-openacr-pilot/schemas/config.schema.json",
+  "title": "Reviewed Drupal 11 pilot configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "config_version",
+    "release_identity",
+    "selection_url",
+    "user_agent",
+    "allowed_hosts",
+    "max_records",
+    "max_response_bytes",
+    "request_timeout_ms",
+    "max_attempts",
+    "max_redirects",
+    "base_backoff_ms",
+    "max_backoff_ms",
+    "max_jitter_ms",
+    "freshness_window_ms",
+    "minimum_live_run_interval_ms",
+    "canonicalization_version",
+    "projection_schema_version"
+  ],
+  "properties": {
+    "config_version": { "const": "1.0.0" },
+    "release_identity": { "const": "Drupal 11 release line / 11.x-dev" },
+    "selection_url": {
+      "const": "https://www.drupal.org/api-d7/node.json?type=project_issue&field_project=3060&field_issue_version=11.x-dev&taxonomy_vocabulary_9=1101&limit=25&sort=nid&direction=DESC&page=0"
+    },
+    "user_agent": {
+      "const": "Zivtech-Drupal-OpenACR-Pilot/0.1 (+https://github.com/zivtech/drupal-openacr-pilot)"
+    },
+    "allowed_hosts": { "const": ["www.drupal.org"] },
+    "max_records": { "const": 25 },
+    "max_response_bytes": { "const": 2097152 },
+    "request_timeout_ms": { "const": 30000 },
+    "max_attempts": { "const": 3 },
+    "max_redirects": { "const": 3 },
+    "base_backoff_ms": { "const": 1000 },
+    "max_backoff_ms": { "const": 30000 },
+    "max_jitter_ms": { "const": 250 },
+    "freshness_window_ms": { "const": 86400000 },
+    "minimum_live_run_interval_ms": { "const": 3600000 },
+    "canonicalization_version": { "const": "drupal-issue-snapshot-jcs-v1" },
+    "projection_schema_version": { "const": "1.0.0" }
+  }
+}

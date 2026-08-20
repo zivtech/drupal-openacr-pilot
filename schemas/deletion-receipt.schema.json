@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zivtech/drupal-openacr-pilot/schemas/deletion-receipt.schema.json",
+  "title": "Response-representation deletion receipt",
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "snapshot_id": {
+      "type": "string",
+      "pattern": "^drupal11-issue-snapshot-[0-9a-f]{16}$"
+    },
+    "utc_timestamp": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,3})?Z$",
+      "format": "strict-utc-timestamp"
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_id",
+    "run_id",
+    "snapshot_candidate_id",
+    "representation_created_at",
+    "deleted_at",
+    "cleanup_deadline",
+    "method",
+    "verification",
+    "backup_cache_disposition",
+    "exception_status",
+    "representation_sha256",
+    "representation_bytes",
+    "recovery"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "record_id": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "snapshot_candidate_id": {
+      "anyOf": [{ "$ref": "#/$defs/snapshot_id" }, { "type": "null" }]
+    },
+    "representation_created_at": { "$ref": "#/$defs/utc_timestamp" },
+    "deleted_at": { "$ref": "#/$defs/utc_timestamp" },
+    "cleanup_deadline": { "$ref": "#/$defs/utc_timestamp" },
+    "method": { "enum": ["unlink", "recovery_unlink"] },
+    "verification": { "const": "path_absent" },
+    "backup_cache_disposition": { "const": "not_backed_up_or_cached" },
+    "exception_status": { "enum": ["none", "approved_debugging_retention"] },
+    "representation_sha256": {
+      "anyOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+    },
+    "representation_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "recovery": { "type": "boolean" }
+  }
+}
